@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // تم حذف سطر output: 'export' من هنا لتفعيل الخوادم الديناميكية
   
   images: {
     unoptimized: true,
-    // هذه الإضافة هي التي ستسمح بظهور الصور وتمنع انهيار الصفحة
     remotePatterns: [
       {
         protocol: 'https',
@@ -12,7 +11,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**', // للسماح بأي صور خارجية مستقبلاً
+        hostname: '**', 
       }
     ],
   },
