@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 import React from 'react';
-export const dynamic = 'force-dynamic';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Share2, Clock, Calculator } from 'lucide-react';
