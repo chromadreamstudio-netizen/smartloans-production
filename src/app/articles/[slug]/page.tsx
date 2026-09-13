@@ -137,10 +137,4 @@ export default function ArticlePage() {
     </div>
   );
 }
-```[cite: 2]
-
-قم بلصق هذا الكود في مشروعك المحلي داخل جهازك، ثم ارفعه عبر GitHub ليتم تحديث الموقع فوراً:
-```bash
-git add .
-git commit -m "Update full article display with rich HTML classes"
-git push
+```[cite: 3]
