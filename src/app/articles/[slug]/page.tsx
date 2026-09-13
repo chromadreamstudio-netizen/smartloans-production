@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Eye } from 'lucide-react';
+import { ArrowLeft, Calendar, Eye, ArrowRight, Calculator } from 'lucide-react';
 
 export default function ArticlePage() {
   const params = useParams();
@@ -108,11 +108,30 @@ export default function ArticlePage() {
           </div>
         )}
 
+        {/* محتوى المقال */}
         <div 
-          className="prose prose-lg dark:prose-invert max-w-none text-slate-700 dark:text-slate-300"
+          className="prose prose-lg dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 mb-16"
           suppressHydrationWarning={true}
           dangerouslySetInnerHTML={{ __html: cleanHtml }}
         />
+
+        {/* إضافة صندوق الـ CTA الاحترافي أسفل المقال */}
+        <div className="mt-16 p-8 md:p-12 bg-gradient-to-br from-blue-900 to-[#0B0C15] rounded-3xl border border-blue-800/50 text-center shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-emerald-400 opacity-80"></div>
+          <Calculator className="w-12 h-12 text-blue-400 mx-auto mb-6 opacity-80 group-hover:scale-110 transition-transform duration-500" />
+          <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">
+            Stop Guessing. Start Calculating.
+          </h3>
+          <p className="text-blue-100/70 mb-8 max-w-xl mx-auto text-lg leading-relaxed">
+            Apply these concepts directly to your finances. Use our free, unbiased tools to get mathematically precise answers in seconds.
+          </p>
+          <Link
+            href="/tools" 
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-slate-900 bg-white rounded-full hover:bg-blue-50 transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] hover:-translate-y-1"
+          >
+            Launch Free Toolkit <ArrowRight className="w-5 h-5 ml-2" />
+          </Link>
+        </div>
         
       </div>
     </div>
