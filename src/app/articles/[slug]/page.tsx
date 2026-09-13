@@ -1,34 +1,68 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Eye } from 'lucide-react';
 
-export const revalidate = 0; // إيقاف الكاش بأمان
+export default function ArticlePage() {
+  const params = useParams();
+  const slug = params?.slug;
+  
+  const [article, setArticle] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function ArticlePage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
-  let article = null;
+  useEffect(() => {
+    if (!slug) return;
 
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/articles?slug=eq.${slug}&select=*`, {
-      headers: {
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-      },
-      next: { revalidate: 0 } // الحل الآمن لتخطي الكاش
-    });
+    async function fetchArticle() {
+      try {
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.length > 0) {
-        article = data[0];
+        if (url && key) {
+          const res = await fetch(`${url}/rest/v1/articles?slug=eq.${slug}&select=*`, {
+            headers: {
+              'apikey': key,
+              'Authorization': `Bearer ${key}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.length > 0) {
+              setArticle(data[0]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching article:', err);
+      } finally {
+        setLoading(false);
       }
     }
-  } catch (err) {
-    console.error('Error fetching article:', err);
+
+    fetchArticle();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0B0C15] pt-32 pb-20 px-6 flex items-center justify-center">
+        <div className="text-slate-500 text-lg">Loading analysis...</div>
+      </div>
+    );
   }
 
   if (!article) {
-    notFound();
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0B0C15] pt-32 pb-20 px-6 text-center">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Article Not Found</h1>
+        <Link href="/articles" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
+          &larr; Back to Articles
+        </Link>
+      </div>
+    );
   }
 
   let formattedDate = 'Recent';
