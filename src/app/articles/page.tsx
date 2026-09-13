@@ -1,25 +1,30 @@
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 export default async function ArticlesIndex() {
   let articles: any[] = [];
   
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/articles?select=slug,title,created_at,views,image_url&order=created_at.desc`, {
-      headers: {
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 0 }
-    });
-    
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        articles = data;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (supabaseUrl && supabaseKey) {
+      const res = await fetch(`${supabaseUrl}/rest/v1/articles?select=slug,title,created_at,views,image_url&order=created_at.desc`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store'
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          articles = data;
+        }
       }
     }
   } catch (err) {
@@ -30,7 +35,6 @@ export default async function ArticlesIndex() {
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B0C15] pt-32 pb-20 px-6 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         
-        {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
             Financial Intelligence
@@ -40,7 +44,6 @@ export default async function ArticlesIndex() {
           </p>
         </div>
 
-        {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles?.map((article: any) => {
             let formattedDate = 'Recent';
@@ -79,7 +82,6 @@ export default async function ArticlesIndex() {
                   </div>
                 )}
 
-                {/* Content */}
                 <div className="p-8 flex-grow flex flex-col">
                   <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mb-4">
                     <span className="flex items-center gap-1">
