@@ -17,10 +17,13 @@ export default async function Home() {
     });
     
     if (res.ok) {
-      latestArticles = await res.json();
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        latestArticles = data;
+      }
     }
   } catch (err) {
-    console.error('Failed to fetch latest articles');
+    console.error('Failed to fetch latest articles:', err);
   }
 
   return (
@@ -51,7 +54,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {latestArticles?.map((article: any) => {
               let formattedDate = 'Recent';
-              if (article.created_at) {
+              if (article?.created_at) {
                 try {
                   formattedDate = new Date(article.created_at).toLocaleDateString('en-US', {
                     year: 'numeric', month: 'short', day: 'numeric'
@@ -61,15 +64,15 @@ export default async function Home() {
 
               return (
                 <Link 
-                  key={article.slug} 
-                  href={`/articles/${article.slug}`} 
+                  key={article?.slug || Math.random()} 
+                  href={`/articles/${article?.slug || ''}`} 
                   className="group flex flex-col bg-white dark:bg-[#131620] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-blue-900/20 transition-all duration-300 hover:-translate-y-2"
                 >
-                  {article.image_url ? (
+                  {article?.image_url ? (
                     <div className="relative h-56 overflow-hidden">
                       <img 
                         src={article.image_url} 
-                        alt={article.title}
+                        alt={article?.title || 'Article'}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         onError={(e) => {
                           e.currentTarget.src = "https://images.pexels.com/photos/6801874/pexels-photo-6801874.jpeg";
@@ -87,11 +90,11 @@ export default async function Home() {
                   <div className="p-8 flex-grow flex flex-col">
                     <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mb-4">
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3"/> {formattedDate}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3"/> {article.views || 0} views</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3"/> {article?.views || 0} views</span>
                     </div>
                     
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                      {article.title}
+                      {article?.title || 'Untitled Article'}
                     </h3>
                     
                     <div className="flex items-center text-blue-600 dark:text-blue-400 font-bold text-sm mt-auto group/btn">
