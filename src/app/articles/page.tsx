@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 
 export const metadata = {
@@ -7,19 +6,20 @@ export const metadata = {
   description: 'Deep dives into mortgage math, investment strategies, and debt payoff plans.',
 };
 
+// إيقاف الكاش بأمان تام ليقرأ الموقع المقالات والصور الجديدة فوراً
+export const revalidate = 0;
+
 export default async function ArticlesIndex() {
-  let articles = [];
+  let articles: any[] = [];
   
   try {
-    // تم إضافة image_url إلى أمر الجلب
     const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/articles?select=slug,title,created_at,views,image_url&order=created_at.desc`, {
       headers: {
         'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
         'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
       },
-      // إيقاف الكاش لضمان ظهور المقالات الجديدة فوراً
-      cache: 'no-store'
+      next: { revalidate: 0 } // الحل الآمن لتخطي الكاش
     });
     
     if (res.ok) {
@@ -33,7 +33,6 @@ export default async function ArticlesIndex() {
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B0C15] pt-32 pb-20 px-6 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         
-        {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
             Financial Intelligence
@@ -43,14 +42,17 @@ export default async function ArticlesIndex() {
           </p>
         </div>
 
-        {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article: any) => {
-            const formattedDate = new Date(article.created_at).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            });
+          {articles?.map((article: any) => {
+            // حماية سيرفر Next.js من الانهيار إذا كان التاريخ غير موجود
+            let formattedDate = 'Recent';
+            if (article.created_at) {
+              try {
+                formattedDate = new Date(article.created_at).toLocaleDateString('en-US', {
+                  year: 'numeric', month: 'short', day: 'numeric'
+                });
+              } catch(e) {}
+            }
 
             return (
               <Link 
@@ -58,7 +60,6 @@ export default async function ArticlesIndex() {
                 href={`/articles/${article.slug}`} 
                 className="group flex flex-col bg-white dark:bg-[#131620] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-blue-900/20 transition-all duration-300 hover:-translate-y-2"
               >
-                {/* عرض الصورة إذا كانت موجودة، أو الخلفية البديلة إذا لم تكن موجودة */}
                 {article.image_url ? (
                   <div className="relative h-56 overflow-hidden">
                     <img 
@@ -78,15 +79,10 @@ export default async function ArticlesIndex() {
                   </div>
                 )}
 
-                {/* Content */}
                 <div className="p-8 flex-grow flex flex-col">
                   <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mb-4">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3"/> {formattedDate}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3"/> {article.views || 0} views
-                    </span>
+                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3"/> {formattedDate}</span>
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3"/> {article.views || 0} views</span>
                   </div>
                   
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
