@@ -61,6 +61,17 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <span className="flex items-center gap-2"><Eye className="w-4 h-4"/> {article.views || 0} Views</span>
         </div>
 
+        {/* عرض صورة الغلاف إذا كانت متوفرة في قاعدة البيانات */}
+        {article.image_url && (
+          <div className="mb-12 w-full h-[400px] md:h-[500px] relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800">
+            <img 
+              src={article.image_url} 
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
         {/* إضافة suppressHydrationWarning لمنع المتصفح من تعطيل الموقع بسبب أكواد AI */}
         <div 
           className="prose prose-lg dark:prose-invert max-w-none text-slate-700 dark:text-slate-300"
