@@ -2,19 +2,20 @@ import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function ArticlesIndex() {
   let articles: any[] = [];
   
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (supabaseUrl && supabaseKey) {
-      const res = await fetch(`${supabaseUrl}/rest/v1/articles?select=slug,title,created_at,views,image_url&order=created_at.desc`, {
+    if (url && key) {
+      const res = await fetch(`${url}/rest/v1/articles?select=slug,title,created_at,views,image_url&order=created_at.desc`, {
         headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': key,
+          'Authorization': `Bearer ${key}`,
           'Content-Type': 'application/json',
         },
         cache: 'no-store'
@@ -28,7 +29,7 @@ export default async function ArticlesIndex() {
       }
     }
   } catch (err) {
-    console.error('Failed to fetch articles:', err);
+    console.error('Fetch error suppressed:', err);
   }
 
   return (
