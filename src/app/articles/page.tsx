@@ -10,16 +10,16 @@ export const metadata = {
 export default async function ArticlesIndex() {
   let articles = [];
   
-  // الاتصال المباشر بقاعدة بيانات Supabase لجلب المقالات
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/articles?select=slug,title,created_at,views&order=created_at.desc`, {
+    // تم إضافة image_url إلى أمر الجلب
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/articles?select=slug,title,created_at,views,image_url&order=created_at.desc`, {
       headers: {
         'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
         'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
       },
-      // نستخدم الكاش الذي سيتم تحديثه سرياً فور انتهاء n8n
-      next: { revalidate: 86400, tags: ['articles'] }
+      // إيقاف الكاش لضمان ظهور المقالات الجديدة فوراً
+      cache: 'no-store'
     });
     
     if (res.ok) {
@@ -46,7 +46,6 @@ export default async function ArticlesIndex() {
         {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article: any) => {
-            // تحويل تاريخ إنشاء المقال إلى تنسيق مقروء
             const formattedDate = new Date(article.created_at).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
@@ -59,12 +58,25 @@ export default async function ArticlesIndex() {
                 href={`/articles/${article.slug}`} 
                 className="group flex flex-col bg-white dark:bg-[#131620] border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-blue-900/20 transition-all duration-300 hover:-translate-y-2"
               >
-                {/* Image Placeholder - خلفية أنيقة كبديل للصور حالياً */}
-                <div className="relative h-56 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                  <span className="text-slate-700 dark:text-slate-600 font-bold text-2xl opacity-30 group-hover:scale-110 transition-transform duration-700">
-                    SmartLoans
-                  </span>
-                </div>
+                {/* عرض الصورة إذا كانت موجودة، أو الخلفية البديلة إذا لم تكن موجودة */}
+                {article.image_url ? (
+                  <div className="relative h-56 overflow-hidden">
+                    <img 
+                      src={article.image_url} 
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.pexels.com/photos/6801874/pexels-photo-6801874.jpeg";
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="relative h-56 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                    <span className="text-slate-700 dark:text-slate-600 font-bold text-2xl opacity-30 group-hover:scale-110 transition-transform duration-700">
+                      SmartLoans
+                    </span>
+                  </div>
+                )}
 
                 {/* Content */}
                 <div className="p-8 flex-grow flex flex-col">

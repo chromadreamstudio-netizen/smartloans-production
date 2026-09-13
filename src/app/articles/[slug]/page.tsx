@@ -12,7 +12,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
         'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
       },
-      next: { revalidate: 86400, tags: ['articles'] }
+      // إيقاف الكاش تماماً لضمان جلب أحدث صورة من قاعدة البيانات فوراً
+      cache: 'no-store'
     });
 
     if (res.ok) {
@@ -29,7 +30,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     notFound();
   }
 
-  // حماية التاريخ من التسبب في انهيار التطبيق إذا كان فارغاً
   let formattedDate = 'Recent';
   if (article.created_at) {
     try {
@@ -39,7 +39,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     } catch (e) {}
   }
 
-  // تنظيف ذكي لكود HTML من أي شوائب يضيفها الذكاء الاصطناعي
   let cleanHtml = article.text || '';
   cleanHtml = cleanHtml.replace(/```html/gi, '').replace(/```/g, '');
   cleanHtml = cleanHtml.replace(/<\/?html[^>]*>/g, '').replace(/<\/?body[^>]*>/g, '');
@@ -61,18 +60,20 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <span className="flex items-center gap-2"><Eye className="w-4 h-4"/> {article.views || 0} Views</span>
         </div>
 
-        {/* عرض صورة الغلاف إذا كانت متوفرة في قاعدة البيانات */}
+        {/* تم إضافة onError لضمان عرض صورة بديلة إذا تعطل الرابط الأساسي */}
         {article.image_url && (
           <div className="mb-12 w-full h-[400px] md:h-[500px] relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800">
             <img 
               src={article.image_url} 
               alt={article.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = "https://images.pexels.com/photos/6801874/pexels-photo-6801874.jpeg";
+              }}
             />
           </div>
         )}
 
-        {/* إضافة suppressHydrationWarning لمنع المتصفح من تعطيل الموقع بسبب أكواد AI */}
         <div 
           className="prose prose-lg dark:prose-invert max-w-none text-slate-700 dark:text-slate-300"
           suppressHydrationWarning={true}
