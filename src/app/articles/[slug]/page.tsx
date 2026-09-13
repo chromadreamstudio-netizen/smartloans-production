@@ -108,14 +108,12 @@ export default function ArticlePage() {
           </div>
         )}
 
-        {/* محتوى المقال مع دعم كامل للـ HTML وصناديق الأكواد */}
         <div 
           className="prose prose-lg dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 mb-16 space-y-6 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:mt-8 [&>h2]:mb-4 [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-blue-400 [&>h3]:mt-6 [&>h3]:mb-3 [&>ul]:list-disc [&>ul]:pl-6 [&>ol]:list-decimal [&>ol]:pl-6 [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-slate-400"
           suppressHydrationWarning={true}
           dangerouslySetInnerHTML={{ __html: cleanHtml }}
         />
 
-        {/* صندوق الـ CTA الاحترافي أسفل المقال */}
         <div className="mt-16 p-8 md:p-12 bg-gradient-to-br from-blue-900 to-[#0B0C15] rounded-3xl border border-blue-800/50 text-center shadow-2xl relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-emerald-400 opacity-80"></div>
           <Calculator className="w-12 h-12 text-blue-400 mx-auto mb-6 opacity-80 group-hover:scale-110 transition-transform duration-500" />
@@ -137,4 +135,3 @@ export default function ArticlePage() {
     </div>
   );
 }
-```[cite: 3]
